@@ -95,33 +95,4 @@ void loop() {
     analogWrite(greenPin, 0);
     analogWrite(bluePin, 0);
   }
-
-  /*
-  Serial.print("Red: ");
-  while(Serial.available()==0) {
-    }
-  redBrightness = Serial.parseInt();
-  Serial.println(redBrightness);
-
-  Serial.print("Green: ");
-  while(Serial.available()==0) {
-    }
-  greenBrightness = Serial.parseInt();
-  Serial.println(greenBrightness);
-
-  Serial.print("Blue: ");
-  while(Serial.available()==0) {
-    }
-  blueBrightness = Serial.parseInt();
-  Serial.println(blueBrightness);
-  Serial.println("  ");
-  */
-
-  /* Sending variable voltages to RGB LED */
-  /*
-  analogWrite(redPin, redBrightness);
-  analogWrite(greenPin, greenBrightness);
-  analogWrite(bluePin, blueBrightness);
-  delay(3000);
-  */
 }
