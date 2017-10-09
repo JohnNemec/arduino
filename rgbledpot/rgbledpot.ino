@@ -2,6 +2,7 @@ int bluePin = 6;
 int greenPin = 10;
 int redPin = 11;
 
+
 /* Pot info */
 int potPin = A0;
 int readValue;
