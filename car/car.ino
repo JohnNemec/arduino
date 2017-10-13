@@ -65,6 +65,7 @@ void loop() {
   else if (distance > 5 && distance <= 12) {
     carSpeed = slowSpeed;
     stopCar();
+    reverse(carSpeed);
     turnRight(carSpeed);
   } 
   else {
