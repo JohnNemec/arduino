@@ -8,7 +8,7 @@
  * Pin 5 is the mouse data pin, pin 6 is the clock pin
  * Feel free to use whatever pins are convenient.
  */
-#define MDATA 5
+#define MDATA 10
 #define MCLK 6
 int xLong;
 int xStore;
@@ -160,7 +160,7 @@ void mouse_init()
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(9600);
   mouse_init();
 }
 
@@ -195,12 +195,12 @@ void loop()
 
   /* send the data back up */
   //Serial.print(mstat, BIN);
-  //Serial.print("\tX=");
-  //Serial.print(mx, DEC);
+  Serial.print("\tX=");
+  Serial.print(mx, DEC);
   //Serial.print("\tY=");
   //Serial.print(my, DEC);
-  //Serial.println();
+  Serial.println();
   //Serial.print("xStore=");
   //Serial.println(xStore);
-  delay(20);  /* twiddle */
+  delayMicroseconds(20);  /* twiddle */
 }
