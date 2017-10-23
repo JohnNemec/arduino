@@ -4,7 +4,7 @@
 #define DS3231_I2C_ADDRESS 0x68
 #define buz 11
 
-const int btnOne = 4;
+const int btnOne = 2; // pushbutton pin, set to 2 so it can be used as an interrupt
 int btnOneState;
 byte cancelAlarm;
 byte alarmSet;
@@ -46,6 +46,7 @@ void setup() {
   pinMode(buz,OUTPUT);
 
   pinMode(btnOne,INPUT);
+  attachInterrupt(0, pin_ISR, CHANGE);
   
   // set the initial time here:
   // DS3231 seconds, minutes, hours, day, date, month, year
@@ -63,6 +64,17 @@ void setup() {
   lcd.backlight(); // finish with backlight on
   lcd.createChar(7, alarmIcon);
 
+}
+
+void pin_ISR() {
+  alarmSetState = digitalRead(btnOne);
+  if ( alarmSetState == HIGH ) {
+    if ( alarmSet == 1 ) {
+      alarmSet = 0; // turn the alarm off      
+    } else {
+      alarmSet = 1; // turn the alarm on
+    }
+  }
 }
 
 void setDS3231time(byte second, byte minute, byte hour, byte dayOfWeek, byte dayOfMonth, byte month, byte year) {
@@ -151,15 +163,6 @@ void displayTime(String ampm) {
     case 7:
       lcd.print("Saturday");
       break;
-  }
-
-  alarmSetState = digitalRead(btnOne);
-  if ( alarmSetState == HIGH ) {
-    if ( alarmSet == 1 ) {
-      alarmSet = 0; // turn the alarm off      
-    } else {
-      alarmSet = 1; // turn the alarm on
-    }
   }
 
   //Serial.print("alarmSetState: ");
