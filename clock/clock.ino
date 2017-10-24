@@ -5,10 +5,11 @@
 #define buz 11
 
 const int btnOne = 2; // pushbutton pin, set to 2 so it can be used as an interrupt
-int btnOneState;
+volatile int btnOneState;
 byte cancelAlarm;
 byte alarmSet;
-byte alarmSetState;
+volatile byte alarmSetState;
+byte alarmIsSounding;
 
 byte alarmIcon[8] = {
   B00100,
@@ -67,12 +68,22 @@ void setup() {
 }
 
 void pin_ISR() {
-  alarmSetState = digitalRead(btnOne);
-  if ( alarmSetState == HIGH ) {
-    if ( alarmSet == 1 ) {
-      alarmSet = 0; // turn the alarm off      
-    } else {
-      alarmSet = 1; // turn the alarm on
+  if (alarmIsSounding == 1) {
+    btnOneState = digitalRead(btnOne);
+    if (btnOneState == HIGH) {
+      cancelAlarm = 1;
+      stopAlarm();
+    }
+  } else {
+    alarmSetState = digitalRead(btnOne);
+    Serial.print("alarmSetState: ");
+    Serial.println(alarmSetState);
+    if ( alarmSetState == HIGH ) {
+      if ( alarmSet == 1 ) {
+        alarmSet = 0; // turn the alarm off
+      } else {
+        alarmSet = 1; // turn the alarm on
+      }
     }
   }
 }
@@ -187,9 +198,9 @@ void loop() {
 
 void Buzzer() {
   digitalWrite(buz,HIGH);
-  delay(100);
+  delay(500);
   digitalWrite(buz,LOW);
-  delay(100);
+  delay(500);
 }
 
 void stopAlarm() {
@@ -199,9 +210,8 @@ void stopAlarm() {
 void soundAlarm(byte hour, byte minute, String ampm) {
   //Comparing the current time with the Alarm time
 
-  Serial.print("before alarm if: ");
-  Serial.println(cancelAlarm);
-  if( cancelAlarm == 0 && hour == 11 && minute == 2 && ampm == "pm" ) {
+  if( cancelAlarm == 0 && hour == 6 && minute == 31 && ampm == "pm" ) {
+    alarmIsSounding = 1;
     Buzzer();
     Buzzer();
       
@@ -213,14 +223,8 @@ void soundAlarm(byte hour, byte minute, String ampm) {
     Buzzer();
     Buzzer();
 
-    btnOneState = digitalRead(btnOne);
-    if (btnOneState == HIGH) {
-      cancelAlarm = 1;
-      stopAlarm();
-        Serial.print("after button click cancelAlarm: ");
-        Serial.println(cancelAlarm);
-        Serial.println("");
-    } 
+  } else {
+    alarmIsSounding = 0;
   }
 }
 
