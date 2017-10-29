@@ -1,10 +1,17 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+#include <DS3231.h>
+
 
 #define DS3231_I2C_ADDRESS 0x68
 #define buz 11
 
+DS3231 Clock;
+byte ADay, AHour, AMinute, ASecond, ABits;
+bool ADy, A12h, Apm;
+
 const int btnOne = 2; // pushbutton pin, set to 2 so it can be used as an interrupt
+const int setBtn = 4; // the setBtn, set to pin 4
 volatile int btnOneState;
 byte cancelAlarm;
 byte alarmSet;
@@ -47,6 +54,7 @@ void setup() {
   pinMode(buz,OUTPUT);
 
   pinMode(btnOne,INPUT);
+  pinMode(setBtn,INPUT);
   attachInterrupt(0, pin_ISR, CHANGE);
   
   // set the initial time here:
@@ -125,7 +133,7 @@ void displayTime(String ampm) {
   byte second, minute, hour, dayOfWeek, dayOfMonth, month, year;
   // retrieve data from DS3231
   readDS3231time(&second, &minute, &hour, &dayOfWeek, &dayOfMonth, &month, &year);
-  // send it to the serial monitor
+  // send it to the LCD
   if (hour>12) {
     hour = hour - 12;
     ampm = "pm";
@@ -189,10 +197,15 @@ void displayTime(String ampm) {
     lcd.setCursor(15,0);
     lcd.print(" ");
   }
+
 }
 
 void loop() {
   displayTime(ampm);
+  while (digitalRead(setBtn) == HIGH) {
+    Serial.println(digitalRead(setBtn));
+    displayAlarm();
+  }
   delay(250); // every second
 }
 
@@ -227,4 +240,40 @@ void soundAlarm(byte hour, byte minute, String ampm) {
     alarmIsSounding = 0;
   }
 }
+
+void displayAlarm(){
+  Clock.getA1Time(ADay, AHour, AMinute, ASecond, ABits, ADy, A12h, Apm);
+
+  // Display Alarm 1 information  
+  lcd.clear();
+  lcd.print("Alarm: ");  
+  lcd.setCursor(0,1);
+
+  if (AHour > 12) {
+    AHour = AHour - 12;
+    ampm = "pm";
+    lcd.print(AHour, DEC);
+  } else {
+    lcd.print(AHour, DEC);
+    ampm = "am";
+  }
+  lcd.print(":");
+  if (AMinute < 10) {
+    lcd.print("0");
+  }
+  lcd.print(AMinute, DEC);
+  lcd.print(ampm);
+
+  if (Clock.checkAlarmEnabled(1)) {
+    Serial.print("enabled");
+  }
+  delay(5000);
+}
+
+void setAlarm(){
+
+    Clock.setA1Time(ADay, AHour, AMinute, ASecond, ABits, ADy, A12h, Apm);
+
+}
+
 
