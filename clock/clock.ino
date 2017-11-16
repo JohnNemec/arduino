@@ -3,6 +3,7 @@
 #include <DS3231.h>
 
 
+
 #define DS3231_I2C_ADDRESS 0x68
 #define buz 11
 
@@ -17,6 +18,8 @@ byte cancelAlarm;
 byte alarmSet;
 volatile byte alarmSetState;
 byte alarmIsSounding;
+
+byte delayTime = (Clock.getSecond() + 10);
 
 byte alarmIcon[8] = {
   B00100,
